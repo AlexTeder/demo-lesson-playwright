@@ -28,4 +28,13 @@ test('login with correct credentials and verify order creation page', async ({})
 
 test('login and create order', async ({}) => {
   // implement test
+  const orderCreationPage = await authPage.signIn(USERNAME, PASSWORD)
+
+  await orderCreationPage.nameInput.fill(faker.person.fullName())
+  await orderCreationPage.phoneInput.fill(faker.phone.number())
+  await orderCreationPage.commentInput.fill(faker.lorem.sentence(5))
+
+  await orderCreationPage.createOrderButton.click()
+
+  await expect(orderCreationPage.orderCreatedPopupOkButton).toBeVisible()
 })

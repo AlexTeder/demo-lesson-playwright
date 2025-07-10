@@ -15,6 +15,52 @@ test('login with correct credentials and verify order creation page', async ({ p
   const authPage = new LoginPage(page)
   await authPage.open()
   const orderCreationPage = await authPage.signIn(USERNAME, PASSWORD)
-  await orderCreationPage.statusButton.click({ force: true })
-  // verify at least few elements on the order creation page
+  await expect(orderCreationPage.logoutButton).toBeVisible()
+  await expect(orderCreationPage.createOrderButton).toBeVisible()
+  await expect(orderCreationPage.nameInput).toBeVisible()
+  await expect(orderCreationPage.phoneInput).toBeVisible()
+  await expect(orderCreationPage.commentInput).toBeVisible()
+})
+
+test('login and create order successfully', async ({ page }) => {
+  const authPage = new LoginPage(page)
+  await authPage.open()
+  const orderCreationPage = await authPage.signIn(USERNAME, PASSWORD)
+
+  await orderCreationPage.nameInput.fill(faker.person.fullName())
+  await orderCreationPage.phoneInput.fill(faker.phone.number())
+  await orderCreationPage.commentInput.fill(faker.lorem.sentence(5))
+  await orderCreationPage.createOrderButton.click()
+  await expect(orderCreationPage.orderCreatedPopupOkButton).toBeVisible()
+})
+
+test('login and logout successfully', async ({ page }) => {
+  const authPage = new LoginPage(page)
+  await authPage.open()
+  const orderCreationPage = await authPage.signIn(USERNAME, PASSWORD)
+
+  await orderCreationPage.logoutButton.click()
+  await expect(authPage.signInButton).toBeVisible(
+  )})
+
+test('login and empty phone input does not allow to create order', async ({ page }) => {
+  const authPage = new LoginPage(page)
+  await authPage.open()
+  const orderCreationPage = await authPage.signIn(USERNAME, PASSWORD)
+
+  await orderCreationPage.nameInput.fill(faker.person.fullName())
+  await orderCreationPage.phoneInput.fill('12')
+  await expect(orderCreationPage.createOrderButton).toBeDisabled()
+})
+
+
+test('login and check phone input error', async ({ page }) => {
+  const authPage = new LoginPage(page)
+  await authPage.open()
+  const orderCreationPage = await authPage.signIn(USERNAME, PASSWORD)
+
+  await orderCreationPage.nameInput.fill(faker.person.fullName())
+  await orderCreationPage.phoneInput.fill('12345')
+  await expect(orderCreationPage.phoneInputError).toBeVisible()
+  await expect(orderCreationPage.createOrderButton).toBeDisabled()
 })
